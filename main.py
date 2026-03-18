@@ -24,51 +24,41 @@ class Contact(BaseModel):
     email: str
     message: str
 
-class ContactRequest(BaseModel):
-    name: str
-    email: str
-    message: str
-
-# GET /
+# API Endpoints
 @app.get("/")
 def read_root():
-    return {"API": "Contact Form API", "version": "1.0"}
+    return {"message": "Welcome to the contact form API"}
 
-# GET /health
 @app.get("/health")
 def read_health():
     return {"status": "healthy"}
 
-# GET /contacts
-@app.get("/contacts", response_model=List[Contact])
+@app.get("/contacts/")
 def read_contacts():
     return list(contacts.values())
 
-# GET /contacts/{contact_id}
-@app.get("/contacts/{contact_id}", response_model=Contact)
+@app.get("/contacts/{contact_id}")
 def read_contact(contact_id: int):
     if contact_id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
     return contacts[contact_id]
 
-# POST /contacts
-@app.post("/contacts", response_model=Contact)
-def create_contact(contact_request: ContactRequest):
-    new_id = len(contacts) + 1
-    contact = Contact(id=new_id, **contact_request.dict())
-    contacts[new_id] = contact
+@app.post("/contacts/")
+def create_contact(contact: Contact):
+    if contact.id in contacts:
+        raise HTTPException(status_code=400, detail="Contact already exists")
+    contacts[contact.id] = contact
     return contact
 
-# PUT /contacts/{contact_id}
-@app.put("/contacts/{contact_id}", response_model=Contact)
-def update_contact(contact_id: int, contact_request: ContactRequest):
+@app.put("/contacts/{contact_id}")
+def update_contact(contact_id: int, contact: Contact):
     if contact_id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    contact = Contact(id=contact_id, **contact_request.dict())
+    if contact.id != contact_id:
+        raise HTTPException(status_code=400, detail="Contact ID mismatch")
     contacts[contact_id] = contact
     return contact
 
-# DELETE /contacts/{contact_id}
 @app.delete("/contacts/{contact_id}")
 def delete_contact(contact_id: int):
     if contact_id not in contacts:

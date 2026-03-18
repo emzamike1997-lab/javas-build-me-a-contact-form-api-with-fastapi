@@ -29,29 +29,29 @@ class ContactRequest(BaseModel):
     email: str
     message: str
 
-# GET /health endpoint
+# GET /
+@app.get("/")
+def read_root():
+    return {"API": "Contact Form API", "version": "1.0"}
+
+# GET /health
 @app.get("/health")
-def get_health():
+def read_health():
     return {"status": "healthy"}
 
-# GET / endpoint
-@app.get("/")
-def get_api_info():
-    return {"api": "Contact Form API", "version": "1.0"}
-
-# GET /contacts endpoint
+# GET /contacts
 @app.get("/contacts", response_model=List[Contact])
-def get_contacts():
+def read_contacts():
     return list(contacts.values())
 
-# GET /contacts/{id} endpoint
-@app.get("/contacts/{id}", response_model=Contact)
-def get_contact(id: int):
-    if id not in contacts:
+# GET /contacts/{contact_id}
+@app.get("/contacts/{contact_id}", response_model=Contact)
+def read_contact(contact_id: int):
+    if contact_id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    return contacts[id]
+    return contacts[contact_id]
 
-# POST /contacts endpoint
+# POST /contacts
 @app.post("/contacts", response_model=Contact)
 def create_contact(contact_request: ContactRequest):
     new_id = len(contacts) + 1
@@ -59,19 +59,19 @@ def create_contact(contact_request: ContactRequest):
     contacts[new_id] = contact
     return contact
 
-# PUT /contacts/{id} endpoint
-@app.put("/contacts/{id}", response_model=Contact)
-def update_contact(id: int, contact_request: ContactRequest):
-    if id not in contacts:
+# PUT /contacts/{contact_id}
+@app.put("/contacts/{contact_id}", response_model=Contact)
+def update_contact(contact_id: int, contact_request: ContactRequest):
+    if contact_id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    contact = Contact(id=id, **contact_request.dict())
-    contacts[id] = contact
+    contact = Contact(id=contact_id, **contact_request.dict())
+    contacts[contact_id] = contact
     return contact
 
-# DELETE /contacts/{id} endpoint
-@app.delete("/contacts/{id}")
-def delete_contact(id: int):
-    if id not in contacts:
+# DELETE /contacts/{contact_id}
+@app.delete("/contacts/{contact_id}")
+def delete_contact(contact_id: int):
+    if contact_id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    del contacts[id]
+    del contacts[contact_id]
     return {"message": "Contact deleted"}

@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
@@ -13,18 +13,30 @@ class ContactForm(BaseModel):
     message: str
 
 @app.get("/")
-def root(): return {"status": "ok", "service": "build me a contact form API with FastAPI"}
+def root(): 
+    return {"status": "ok", "service": "build me a contact form API with FastAPI"}
 
 @app.get("/health")
-def health(): return {"status": "healthy"}
+def health(): 
+    return {"status": "healthy"}
 
 @app.post("/contact")
 async def create_contact_form(contact_form: ContactForm):
-    return {"status": "ok", "message": f"Contact form submitted successfully by {contact_form.name}"}
+    try:
+        # Here you can add your logic to save the contact form data
+        # For example, you can save it to a database or send an email
+        return {"message": "Contact form submitted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/contact/form")
-async def create_contact_form_with_form(name: str = Form(...), email: str = Form(...), message: str = Form(...)):
-    return {"status": "ok", "message": f"Contact form submitted successfully by {name}"}
+@app.get("/contact")
+async def get_contact_forms():
+    try:
+        # Here you can add your logic to retrieve the contact form data
+        # For example, you can retrieve it from a database
+        return [{"message": "No contact forms found"}]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     print("🚀 FastAPI app starting...")

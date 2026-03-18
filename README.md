@@ -1,2 +1,3 @@
-# javas-build-me-a-contact-form-api-with-fastapi
-JAVAS: build me a contact form API with FastAPI
+# build me a contact form API with FastAPI
+FastAPI application deployed on Railway.
+Visit /docs for interactive API documentation.

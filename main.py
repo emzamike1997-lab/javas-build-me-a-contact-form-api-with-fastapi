@@ -24,44 +24,50 @@ class Contact(BaseModel):
     email: str
     message: str
 
-# API Endpoints
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the contact form API"}
-
+# GET /health endpoint
 @app.get("/health")
-def read_health():
+def get_health():
     return {"status": "healthy"}
 
-@app.get("/contacts/")
-def read_contacts():
+# GET / endpoint
+@app.get("/")
+def get_api_info():
+    return {"api": "Contact Form API", "version": "1.0"}
+
+# GET /contacts endpoint
+@app.get("/contacts")
+def get_contacts():
     return list(contacts.values())
 
-@app.get("/contacts/{contact_id}")
-def read_contact(contact_id: int):
-    if contact_id not in contacts:
+# GET /contacts/{id} endpoint
+@app.get("/contacts/{id}")
+def get_contact(id: int):
+    if id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    return contacts[contact_id]
+    return contacts[id]
 
-@app.post("/contacts/")
+# POST /contacts endpoint
+@app.post("/contacts")
 def create_contact(contact: Contact):
     if contact.id in contacts:
         raise HTTPException(status_code=400, detail="Contact already exists")
     contacts[contact.id] = contact
     return contact
 
-@app.put("/contacts/{contact_id}")
-def update_contact(contact_id: int, contact: Contact):
-    if contact_id not in contacts:
+# PUT /contacts/{id} endpoint
+@app.put("/contacts/{id}")
+def update_contact(id: int, contact: Contact):
+    if id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    if contact.id != contact_id:
+    if contact.id != id:
         raise HTTPException(status_code=400, detail="Contact ID mismatch")
-    contacts[contact_id] = contact
+    contacts[id] = contact
     return contact
 
-@app.delete("/contacts/{contact_id}")
-def delete_contact(contact_id: int):
-    if contact_id not in contacts:
+# DELETE /contacts/{id} endpoint
+@app.delete("/contacts/{id}")
+def delete_contact(id: int):
+    if id not in contacts:
         raise HTTPException(status_code=404, detail="Contact not found")
-    del contacts[contact_id]
+    del contacts[id]
     return {"message": "Contact deleted"}
